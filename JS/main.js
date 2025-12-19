@@ -288,6 +288,7 @@ function openOrders() {
     `<div style="margin-top:12px"><button class='btn' onclick="closeModal('ordersModal')">Close</button></div>`;
   window.location.href = "orders.html";
 }
+
 function renderOrderRow(o) {
   const rows = o.items
     .map((i) => {
@@ -404,6 +405,7 @@ function register() {
   updateAuthUI();
   window.location.href = "index.html";
 }
+
 function login() {
   const u = (
     (document.getElementById("liUser") &&
@@ -434,6 +436,7 @@ function login() {
     window.location.href = "index.html";
   } else alert("Invalid credentials");
 }
+
 function togglePassword(inputId) {
   const input = document.getElementById(inputId);
   const toggleBtn = input.parentNode.querySelector(".password-toggle i");
@@ -446,6 +449,7 @@ function togglePassword(inputId) {
     toggleBtn.className = "fas fa-eye";
   }
 }
+
 function logout() {
   currentUser = null;
   localStorage.removeItem("currentUser");
@@ -483,6 +487,7 @@ function showAdmin(bypass) {
   openModal("adminModal");
   if (bypass) adminAuth(true);
 }
+
 function adminLogin() {
   const u =
     (document.getElementById("adUser") &&
