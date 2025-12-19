@@ -19,7 +19,7 @@ body {
   padding: 20px;
 }
 
-/* Background Blur Effect */
+/* Background Blur Effect*/
 .background-blur {
   position: fixed;
   top: 0;
@@ -31,7 +31,7 @@ body {
   z-index: -1;
 }
 
-/* Compact Header */
+/* Compact Header*/
 .compact-header {
   margin-bottom: 20px;
   text-align: center;
@@ -60,7 +60,7 @@ body {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Main Container */
+/* Main Container*/
 .container-compact {
   display: flex;
   gap: 30px;
@@ -69,7 +69,7 @@ body {
   align-items: flex-start;
 }
 
-/* Auth Card - Compact */
+/* Auth Card - Compact*/
 .auth-card-compact {
   background: white;
   border-radius: 16px;
