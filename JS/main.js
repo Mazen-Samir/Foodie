@@ -1,4 +1,6 @@
-const sample = [
+// =========================================== Hamada ===========================================
+
+const initialMenuItems = [
   {
     id: 1,
     name: "Margherita Pizza",
@@ -56,7 +58,7 @@ const sample = [
     desc: "Herb-marinated grilled chicken with sides.",
   },
   {
-    id: 8,    
+    id: 8,
     name: "Pepperoni Pizza",
     price: 9.5,
     category: "Pizza",
@@ -66,7 +68,7 @@ const sample = [
 ];
 
 // ---------- App state (persist in localStorage) ----------
-let dishes = JSON.parse(localStorage.getItem("dishes")) || sample;
+let dishes = JSON.parse(localStorage.getItem("dishes")) || initialMenuItems;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let users = JSON.parse(localStorage.getItem("users")) || [];
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
@@ -125,6 +127,10 @@ function renderMenu() {
         </div>`;
       container.appendChild(el);
     });
+
+  if (container.innerHTML === "") {
+    container.innerHTML = '<div class="large">No dishes found.</div>';
+  }
   renderCartSidebar();
 }
 
@@ -158,6 +164,7 @@ function addToCart(id) {
   renderCartSidebar();
   updateCartCount();
 }
+
 function removeFromCart(id) {
   cart = cart.filter((c) => c.id !== id);
   saveCart();
@@ -224,8 +231,7 @@ function updateCartCount() {
 function openCart() {
   const modal = document.getElementById("cartModalContent");
   if (cart.length === 0) {
-    modal.innerHTML =
-      `<h3>Your Cart</h3><div class="small">Cart is empty</div><div style="margin-top:12px"><button class="btn" onclick="closeModal('cartModal')">Close</button></div>`;
+    modal.innerHTML = `<h3>Your Cart</h3><div class="small">Cart is empty</div><div style="margin-top:12px"><button class="btn" onclick="closeModal('cartModal')">Close</button></div>`;
     openModal("cartModal");
     return;
   }
@@ -278,39 +284,87 @@ function openOrders() {
         : '<div class="small">No orders yet.</div>'
       : '<div class="small">Please login to see orders.</div>') +
     `<div style="margin-top:12px"><button class='btn' onclick="closeModal('ordersModal')">Close</button></div>`;
-  openModal("ordersModal");
+  window.location.href = "orders.html";
 }
 function renderOrderRow(o) {
   const rows = o.items
     .map((i) => {
       const d = dishes.find((x) => x.id === i.id);
-      return `<div style='font-size:13px'>${d ? d.name : "Item"} × ${
-        i.qty
-      }</div>`;
+      return `
+        <div style="font-size:13px">
+          ${d ? d.name : "Item"} × ${i.qty}
+        </div>
+      `;
     })
     .join("");
+
   const created = new Date(o.created);
-  const canCancel = Date.now() - new Date(o.created).getTime() < 5 * 60 * 1000; // 5 minutes
-  return (
-    `
-    <div style='border:1px solid #eee;padding:10px;border-radius:8px;margin-top:8px'>
-      <div style='display:flex;justify-content:space-between'>
-        <div><b>Order #${
-          o.orderId
-        }</b><div class='small'>${created.toLocaleString()}</div></div>
+  const canCancel = Date.now() - created.getTime() < 5 * 60 * 1000; // 5 minutes
+
+  return `
+    <div style="border:1px solid #eee;padding:10px;border-radius:8px;margin-top:8px">
+      
+      <div style="display:flex;justify-content:space-between">
+        <div>
+          <b>Order #${o.orderId}</b>
+          <div class="small">${created.toLocaleString()}</div>
+        </div>
         <div><b>$${o.total.toFixed(2)}</b></div>
       </div>
-      <div style='margin-top:8px'>${rows}</div>
-      <div style='margin-top:8px;display:flex;gap:8px'><div class='small'>Status: ${
-        o.status
-      }</div>` +
-    (canCancel && o.status === "Pending"
-      ? `<button class='btn' onclick='cancelOrder(${o.orderId})'>Cancel</button>`
-      : "") +
-    `</div>
-    </div>`
-  );
+
+      <div style="margin-top:8px">
+        ${rows}
+      </div>
+
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <div class="small">Status: ${o.status}</div>
+
+        ${
+          canCancel && o.status === "Pending"
+            ? `<button class="btn" onclick="cancelOrder(${o.orderId})">
+                 Cancel
+               </button>`
+            : ""
+        }
+      </div>
+
+    </div>
+  `;
 }
+
+function renderOrdersPage() {
+  const user = localStorage.getItem("currentUser");
+  const container = document.getElementById("ordersListId");
+
+  if (!user) {
+    container.innerHTML = "Please login to see your orders.";
+    return;
+  }
+
+  const userOrders = orders.filter((o) => o.user === user);
+
+  if (userOrders.length === 0) {
+    container.innerHTML = "No orders yet.";
+    return;
+  }
+
+  container.innerHTML = userOrders
+    .map(
+      (o) => `
+    <div class="order-card">
+      <h4>Order #${o.orderId}</h4>
+      <p>Status: ${o.status}</p>
+      <p>Total: $${o.total.toFixed(2)}</p>
+      <p>Date: ${new Date(o.created).toLocaleString()}</p>
+      <button class="btn btn-primary" onclick="cancelOrder(${
+        o.orderId
+      })">cancel</button>
+    </div>
+  `
+    )
+    .join("");
+}
+
 function cancelOrder(orderId) {
   const idx = orders.findIndex((x) => x.orderId === orderId);
   if (idx === -1) return;
@@ -322,28 +376,10 @@ function cancelOrder(orderId) {
 
 // ---------- Authentication (simple, localStorage) ----------
 function showLogin() {
-  const el = document.getElementById("loginModalContent");
-  el.innerHTML = `
-  <h3>Login</h3>
-  <input id='liUser' placeholder='username' style='width:100%;padding:10px;margin-top:8px'>
-  <input id='liPass' type='password' placeholder='password' style='width:100%;padding:10px;margin-top:8px'>
-  <div style='margin-top:10px;display:flex;gap:8px'>
-    <button class='btn' onclick='login()'>Login</button>
-    <button class='btn secondary' onclick="closeModal('loginModal')">Close</button>
-  </div>`;
-  openModal("loginModal");
+  window.location.href = "login.html";
 }
 function showRegister() {
-  const el = document.getElementById("registerModalContent");
-  el.innerHTML = `
-  <h3>Register</h3>
-  <input id='reUser' placeholder='username' style='width:100%;padding:10px;margin-top:8px'>
-  <input id='rePass' type='password' placeholder='password' style='width:100%;padding:10px;margin-top:8px'>
-  <div style='margin-top:10px;display:flex;gap:8px'>
-    <button class='btn' onclick='register()'>Create</button>
-    <button class='btn secondary' onclick="closeModal('registerModal')">Close</button>
-  </div>`;
-  openModal("registerModal");
+  window.location.href = "login.html";
 }
 
 function register() {
@@ -364,7 +400,7 @@ function register() {
   localStorage.setItem("currentUser", currentUser);
   closeModal("registerModal");
   updateAuthUI();
-  alert("Registered & logged in");
+  window.location.href = "index.html";
 }
 function login() {
   const u = (
@@ -376,9 +412,11 @@ function login() {
     (document.getElementById("liPass") &&
       document.getElementById("liPass").value) ||
     "";
+  if (!u || !p) return alert("Enter username and password");
   if (u === adminCred.user && p === adminCred.pass) {
     closeModal("loginModal");
     showAdmin(true);
+    window.location.href = "index.html";
     return;
   }
   const found = users.find((x) => x.user === u && x.pass === p);
@@ -387,8 +425,21 @@ function login() {
     localStorage.setItem("currentUser", currentUser);
     closeModal("loginModal");
     updateAuthUI();
-    alert("Logged in");
+
+    window.location.href = "index.html";
   } else alert("Invalid credentials");
+}
+function togglePassword(inputId) {
+  const input = document.getElementById(inputId);
+  const toggleBtn = input.parentNode.querySelector(".password-toggle i");
+
+  if (input.type === "password") {
+    input.type = "text";
+    toggleBtn.className = "fas fa-eye-slash";
+  } else {
+    input.type = "password";
+    toggleBtn.className = "fas fa-eye";
+  }
 }
 function logout() {
   currentUser = null;
@@ -401,6 +452,7 @@ function updateAuthUI() {
   const navRegister = document.getElementById("navRegister");
   if (!navLogin || !navRegister) return;
   navLogin.textContent = currentUser ? `Hello, ${currentUser}` : "Login";
+  navLogin.onclick = currentUser ? openOrders : showLogin;
   navRegister.textContent = currentUser ? "Logout" : "Sign up";
   if (currentUser) navRegister.onclick = logout;
   else navRegister.onclick = showRegister;
@@ -497,7 +549,11 @@ function renderAdminList() {
   el.innerHTML = dishes
     .map(
       (d) =>
-        `<div style='display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee'><div><b>${d.name}</b><div class='small'>${d.category} • $${d.price}</div></div><div><button class='btn' onclick='removeDish(${d.id})'>Remove</button></div></div>`
+        `<div style='display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee'>
+      <div><b>${d.name}</b><div class='small'>${d.category} • $${d.price}</div>
+      </div><div>
+      <button class='btn' onclick='removeDish(${d.id})'>Remove</button>
+      </div></div>`
     )
     .join("");
 }
@@ -619,7 +675,30 @@ function finalizeOrder() {
   updateCartCount();
   renderCartSidebar();
   closeModal("checkoutModal");
-  alert("Order placed successfully!");
+}
+
+function openHome() {
+  window.location.href = "index.html";
+}
+
+
+function switchTab(tabName) {
+  // Update tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelectorAll('.auth-form').forEach(form => {
+    form.classList.remove('active');
+  });
+  
+  // Activate selected tab
+  if (tabName === 'login') {
+    document.querySelector('.tab-btn:first-child').classList.add('active');
+    document.getElementById('login-form').classList.add('active');
+  } else {
+    document.querySelector('.tab-btn:last-child').classList.add('active');
+    document.getElementById('register-form').classList.add('active');
+  }
 }
 
 // init
@@ -634,3 +713,5 @@ document.querySelectorAll(".modal").forEach((m) =>
     if (e.target === m) m.style.display = "none";
   })
 );
+
+

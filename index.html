@@ -4,40 +4,39 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="CSS/style.css">
+
   <title>Foodie — Restaurant Ordering (Fixed)</title>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <img src="images/favicon.png" alt="logo" style="border-radius:8px;height:44px;width:44px;object-fit:cover">
-      <div>
-        <h1>Foodie</h1>
-        <div style="font-size:12px;color:#bbb">Order from your favourite restaurants</div>
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="images/favicon.png" alt="logo" style="border-radius:8px;height:44px;width:44px;object-fit:cover">
+        <a href="#" class="">Foodie</a>
       </div>
-    </div>
-    <nav>
-      <a href="#" onclick="openOrders()">Orders</a>
-      <a href="#" onclick="showLogin()" id="navLogin">Login</a>
+      <div class="nav-links">
+        <a href="#" disabled onclick="showLogin()" id="navLogin">Login</a>
+        <a href="#" onclick="openOrders()"> My Orders</a>
       <a href="#" onclick="showRegister()" id="navRegister">Sign up</a>
       <a href="#" onclick="showAdmin()">Admin</a>
       <a href="#" onclick="openCart()">Cart (<span id="cartCount">0</span>)</a>
-    </nav>
+      </div>
+    </div>
   </header>
 
   <main class="container">
-    <section class="hero">
-      <div class="search">
-        <input id="search" placeholder="Search dishes or restaurants..." oninput="renderMenu()">
-      </div>
-      <div class="filter" style="width:220px">
-        <select id="category" onchange="renderMenu()">
-          <option value="all">All categories</option>
-        </select>
-      </div>
-    </section>
-
     <div class="grid">
       <div class="menu">
+        <div class="hero">
+          <div class="search">
+            <input id="search" placeholder="Search dishes or restaurants..." oninput="renderMenu()">
+          </div>
+          <div class="filter" style="width:220px">
+            <select id="category" onchange="renderMenu()">
+              <option value="all">All categories</option>
+            </select>
+          </div>
+        </div>
         <h2>Menu</h2>
         <div class="menu-list" id="menuList"></div>
       </div>
@@ -67,14 +66,12 @@
   </main>
 
   <div class="modal" id="cartModal"><div class="content" id="cartModalContent"></div></div>
-  <div class="modal" id="loginModal"><div class="content" id="loginModalContent"></div></div>
-  <div class="modal" id="registerModal"><div class="content" id="registerModalContent"></div></div>
   <div class="modal" id="dishModal"><div class="content" id="dishModalContent"></div></div>
   <div class="modal" id="ordersModal"><div class="content" id="ordersModalContent"></div></div>
   <div class="modal" id="adminModal"><div class="content" id="adminModalContent"></div></div>
   <div class="modal" id="checkoutModal"><div class="content" id="checkoutContent"></div></div>
 
-  <footer class="py-4">
+  <footer>
     <div class="container">
       <div class="row">
         <div class="box text-center text-white pt-2">
