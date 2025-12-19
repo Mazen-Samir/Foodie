@@ -90,7 +90,7 @@ function populateCategories() {
   });
 }
 
-// render menu
+// render menu 
 function renderMenu() {
   const q = ( 
     (document.getElementById("search") &&
@@ -171,6 +171,7 @@ function removeFromCart(id) {
   renderCartSidebar();
   updateCartCount();
 }
+
 function changeQty(id, delta) {
   const it = cart.find((c) => c.id === id);
   if (!it) return;
@@ -180,6 +181,7 @@ function changeQty(id, delta) {
   renderCartSidebar();
   updateCartCount();
 }
+
 function clearCart() {
   cart = [];
   saveCart();
