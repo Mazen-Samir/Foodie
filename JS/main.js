@@ -414,9 +414,12 @@ function login() {
     "";
   if (!u || !p) return alert("Enter username and password");
   if (u === adminCred.user && p === adminCred.pass) {
-    closeModal("loginModal");
-    showAdmin(true);
+    currentUser = u;
+    localStorage.setItem("currentUser", currentUser);
+    updateAuthUI();
     window.location.href = "index.html";
+    showAdmin(true);
+
     return;
   }
   const found = users.find((x) => x.user === u && x.pass === p);
