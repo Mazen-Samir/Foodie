@@ -193,6 +193,8 @@ select:focus {
   color: var(--muted);
 }
 
+
+
 /* modals */
 .modal {
   display: none;
@@ -232,4 +234,10 @@ footer {
     position: static;
   }
 }
+
+
+
+
+
+
 
