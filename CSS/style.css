@@ -193,8 +193,6 @@ select:focus {
   color: var(--muted);
 }
 
-
-
 /* modals */
 .modal {
   display: none;
@@ -231,7 +229,7 @@ footer {
     grid-template-columns: 1fr;
   }
   .aside {
-    position: static;
+    position:static;
   }
 }
 
