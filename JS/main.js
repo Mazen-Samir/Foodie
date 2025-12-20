@@ -90,6 +90,7 @@ function populateCategories() {
   });
 }
 
+
 // render menu
 function renderMenu() {
   const q = (
