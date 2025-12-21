@@ -1,4 +1,3 @@
-// =========================================== Hamada ===========================================
 
 const initialMenuItems = [
   {
@@ -241,8 +240,7 @@ function openCart() {
   }
 
   let total = 0;
-  const lines = cart
-    .map((c) => {
+  const lines = cart.map((c) => {
       const d = dishes.find((x) => x.id === c.id);
       total += d.price * c.qty;
       return `
@@ -276,66 +274,62 @@ function placeOrder() {
 
 // ---------- Orders & cancellation (within 5 minutes) ----------
 function openOrders() {
-  const el = document.getElementById("ordersModalContent");
-  const userOrders = currentUser
-    ? orders.filter((o) => o.user === currentUser)
-    : [];
-  el.innerHTML =
-    `<h3>Your Orders</h3>` +
-    (currentUser
-      ? userOrders.length
-        ? userOrders.map((o) => renderOrderRow(o)).join("")
-        : '<div class="small">No orders yet.</div>'
-      : '<div class="small">Please login to see orders.</div>') +
-    `<div style="margin-top:12px"><button class='btn' onclick="closeModal('ordersModal')">Close</button></div>`;
+  // const el = document.getElementById("ordersModalContent");
+  // const userOrders = currentUser ? orders.filter((o) => o.user === currentUser): [];
+  // el.innerHTML =
+  //   `<h3>Your Orders</h3>` +
+  //   (currentUser
+  //     ? userOrders.length
+  //       ? userOrders.map((o) => renderOrderRow(o)).join("")
+  //       : '<div class="small">No orders yet.</div>'
+  //     : '<div class="small">Please login to see orders.</div>') +
+  //   `<div style="margin-top:12px"><button class='btn' onclick="closeModal('ordersModal')">Close</button></div>`;
   window.location.href = "orders.html";
 }
 
-function renderOrderRow(o) {
-  const rows = o.items
-    .map((i) => {
-      const d = dishes.find((x) => x.id === i.id);
-      return `
-        <div style="font-size:13px">
-          ${d ? d.name : "Item"} × ${i.qty}
-        </div>
-      `;
-    })
-    .join("");
+// function renderOrderRow(o) {
+//   const rows = o.items
+//     .map((i) => {
+//       const d = dishes.find((x) => x.id === i.id);
+//       return `
+//         <div style="font-size:13px">
+//           ${d ? d.name : "Item"} × ${i.qty}
+//         </div>
+//       `;
+//     })
+//     .join("");
 
-  const created = new Date(o.created);
-  const canCancel = Date.now() - created.getTime() < 5 * 60 * 1000; // 5 minutes
 
-  return `
-    <div style="border:1px solid #eee;padding:10px;border-radius:8px;margin-top:8px">
+//   return `
+//     <div style="border:1px solid #eee;padding:10px;border-radius:8px;margin-top:8px">
       
-      <div style="display:flex;justify-content:space-between">
-        <div>
-          <b>Order #${o.orderId}</b>
-          <div class="small">${created.toLocaleString()}</div>
-        </div>
-        <div><b>$${o.total.toFixed(2)}</b></div>
-      </div>
+//       <div style="display:flex;justify-content:space-between">
+//         <div>
+//           <b>Order #${o.orderId}</b>
+//           <div class="small">${created.toLocaleString()}</div>
+//         </div>
+//         <div><b>$${o.total.toFixed(2)}</b></div>
+//       </div>
 
-      <div style="margin-top:8px">
-        ${rows}
-      </div>
+//       <div style="margin-top:8px">
+//         ${rows}
+//       </div>
 
-      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-        <div class="small">Status: ${o.status}</div>
+//       <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+//         <div class="small">Status: ${o.status}</div>
 
-        ${
-          canCancel && o.status === "Pending"
-            ? `<button class="btn" onclick="cancelOrder(${o.orderId})">
-                 Cancel
-               </button>`
-            : ""
-        }
-      </div>
+//         ${
+//           canCancel && o.status === "Pending"
+//             ? `<button class="btn" onclick="cancelOrder(${o.orderId})">
+//                  Cancel
+//                </button>`
+//             : ""
+//         }
+//       </div>
 
-    </div>
-  `;
-}
+//     </div>
+//   `;
+// }
 
 function renderOrdersPage() {
   const user = localStorage.getItem("currentUser");
@@ -373,10 +367,15 @@ function renderOrdersPage() {
 function cancelOrder(orderId) {
   const idx = orders.findIndex((x) => x.orderId === orderId);
   if (idx === -1) return;
-  orders[idx].status = "Cancelled";
-  localStorage.setItem("orders", JSON.stringify(orders));
-  openOrders();
-  alert("Order cancelled");
+  const canCancel = Date.now() - new Date(orders[idx].created).getTime() < 5 * 60 * 1000; // 5 minutes
+  if (canCancel) {
+    orders[idx].status = "Cancelled";
+    localStorage.setItem("orders", JSON.stringify(orders));
+    openOrders();
+    alert("Order cancelled");
+  }
+  else
+    alert("Cancellation period expired");
 }
 
 // ---------- Authentication (simple, localStorage) ----------
@@ -441,14 +440,11 @@ function login() {
 
 function togglePassword(inputId) {
   const input = document.getElementById(inputId);
-  const toggleBtn = input.parentNode.querySelector(".password-toggle i");
 
   if (input.type === "password") {
     input.type = "text";
-    toggleBtn.className = "fas fa-eye-slash";
   } else {
     input.type = "password";
-    toggleBtn.className = "fas fa-eye";
   }
 }
 
